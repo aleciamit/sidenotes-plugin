@@ -15,15 +15,7 @@ function capitalize(word) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
-function formatTime(date) {
-  const options = {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  };
-  return date.toLocaleString("en-US", options);
-}
+
 
 async function createNote(text, role, noteType, position) {
   const noteId = Date.now().toString();
@@ -52,7 +44,7 @@ async function createNote(text, role, noteType, position) {
   noteFrame.paddingRight = 12;
   noteFrame.cornerRadius = 8;
   noteFrame.resize(280, 120);
-  noteFrame.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+  noteFrame.fills = [{ type: "SOLID", color: typeData.color }];
   noteFrame.strokes = [{ type: "SOLID", color: { r: 0.88, g: 0.88, b: 0.88 } }];
   noteFrame.strokeWeight = 1;
   noteFrame.effects = [
@@ -81,12 +73,13 @@ async function createNote(text, role, noteType, position) {
 
   // Meta text (role + timestamp)
   const metaNode = figma.createText();
-  const dateString = timestamp.toLocaleString("default", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+const month = timestamp.toLocaleString('en-US', { month: 'short' });
+const day = timestamp.getDate();
+let hours = timestamp.getHours();
+const minutes = timestamp.getMinutes().toString().padStart(2, '0');
+const ampm = hours >= 12 ? 'PM' : 'AM';
+hours = hours % 12 || 12;
+const dateString = `${month} ${day}, ${hours}:${minutes} ${ampm}`;
   metaNode.fontSize = 10;
   metaNode.lineHeight = { value: 16, unit: "PIXELS" };
   metaNode.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
@@ -100,13 +93,16 @@ async function createNote(text, role, noteType, position) {
 
   // Meta frame (horizontal layout)
   const metaFrame = figma.createFrame();
-  metaFrame.layoutMode = "HORIZONTAL";
+  metaFrame.layoutMode = "VERTICAL";
+  metaFrame.layoutAlign = "MIN";
   metaFrame.counterAxisSizingMode = "AUTO";
   metaFrame.primaryAxisSizingMode = "AUTO";
+  metaFrame.primaryAxisAlignItems = "MIN";
   metaFrame.itemSpacing = 6;
   metaFrame.fills = [];
   metaFrame.strokes = [];
 
+  
   metaNode.characters = `${capitalize(role)} • ${dateString}`;
   metaFrame.appendChild(metaNode);
   metaFrame.appendChild(dot);
@@ -150,7 +146,7 @@ figma.ui.onmessage = async (msg) => {
       .join("\n\n---\n\n");
 
     figma.ui.postMessage({ type: "EXPORT_RESULTS", text: markdown });
-    
+
   } else if (msg.type === "toggle-notes") {
     const notes = figma.currentPage.findAll(
       (node) => node.getPluginData("noteId") !== ""
