@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SideNotes</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fafa;
+      margin: 0;
+      padding: 20px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    h3 {
+      margin-top: 0;
+      font-weight: 600;
+    }
+
+    label {
+      margin-top: 16px;
+      display: block;
+      font-weight: 500;
+    }
+
+    textarea, select, button {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #d1d1d1;
+      font-family: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #f1f3f5;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      font-weight: 500;
+      margin-top: 12px;
+    }
+
+    button:hover {
+      background-color: #e1e4e7;
+    }
+
+    .subtext {
+      font-size: 12px;
+      color: #777;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h3>➕ Add a Note</h3>
+
+  <label for="noteText">Note:</label>
+  <textarea id="noteText" placeholder="What’s on your mind?"></textarea>
+
+  <label for="role">Role:</label>
+  <select id="role">
+    <option value="designer">Designer</option>
+    <option value="pm">Product Manager</option>
+    <option value="dev">Developer</option>
+    <option value="stakeholder">Stakeholder</option>
+  </select>
+
+  <label for="type">What type of comment is this?</label>
+  <select id="type">
+    <option value="question">❓ Question</option>
+    <option value="feedback">💬 Feedback</option>
+    <option value="issue">🚫 Issue</option>
+    <option value="resolved">✅ Resolved</option>
+    <option value="direction">📐 Direction</option>
+  </select>
+  <div class="subtext">Color is applied automatically based on the comment type.</div>
+
+  <button id="addNote">Add Note</button>
+  <button id="toggleNotes">Show/Hide Notes</button>
+
+  <script>
+    document.getElementById('addNote').onclick = () => {
+      const text = document.getElementById('noteText').value;
+      const role = document.getElementById('role').value;
+      const type = document.getElementById('type').value;
+
+      // Send type to plugin, plugin will assign color
+      parent.postMessage({ pluginMessage: { type: 'START_PLACEMENT', text, role, noteType: type } }, '*');
+    };
+
+    document.getElementById('toggleNotes').onclick = () => {
+      parent.postMessage({ pluginMessage: { type: 'toggle-notes' } }, '*');
+    };
+  </script>
+</body>
+</html>
