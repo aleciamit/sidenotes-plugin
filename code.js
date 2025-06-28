@@ -150,5 +150,17 @@ figma.ui.onmessage = async (msg) => {
       .join("\n\n---\n\n");
 
     figma.ui.postMessage({ type: "EXPORT_RESULTS", text: markdown });
+    
+  } else if (msg.type === "toggle-notes") {
+    const notes = figma.currentPage.findAll(
+      (node) => node.getPluginData("noteId") !== ""
+    );
+    const anyVisible = notes.some((note) => note.visible === true);
+
+    for (const note of notes) {
+      note.visible = !anyVisible;
+    }
+
+    figma.notify(anyVisible ? "Notes hidden" : "Notes shown");
   }
 };

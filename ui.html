@@ -40,7 +40,7 @@
       cursor: pointer;
       transition: background 0.2s ease;
       font-weight: 500;
-      margin-top: 12px;
+      margin-top: 36px;
     }
 
     button:hover {
@@ -51,11 +51,74 @@
       font-size: 12px;
       color: #777;
       margin-top: 4px;
+      display: block;
+      line-height: 1.4;
     }
+
+    .toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .2s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .2s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4CAF50;
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
   </style>
 </head>
+
 <body>
-  <h3>➕ Add a Note</h3>
+  <div class="toggle-container">
+  <label class="toggle-switch">
+    <input type="checkbox" id="toggleNotes">
+    <span class="slider"></span>
+  </label>
+  <span id="toggleLabel" style="line-height: 1; font-size: 14px; position: relative; top: 8px;">Hide Notes</span>
+</div>
 
   <label for="noteText">Note:</label>
   <textarea id="noteText" placeholder="What’s on your mind?"></textarea>
@@ -79,7 +142,7 @@
   <div class="subtext">Color is applied automatically based on the comment type.</div>
 
   <button id="addNote">Add Note</button>
-  <button id="toggleNotes">Show/Hide Notes</button>
+  
 
   <script>
     document.getElementById('addNote').onclick = () => {
@@ -91,9 +154,13 @@
       parent.postMessage({ pluginMessage: { type: 'START_PLACEMENT', text, role, noteType: type } }, '*');
     };
 
-    document.getElementById('toggleNotes').onclick = () => {
-      parent.postMessage({ pluginMessage: { type: 'toggle-notes' } }, '*');
-    };
+const toggleNotesCheckbox = document.getElementById('toggleNotes');
+const toggleLabel = document.getElementById('toggleLabel');
+
+toggleNotesCheckbox.addEventListener('change', () => {
+  parent.postMessage({ pluginMessage: { type: 'toggle-notes' } }, '*');
+  toggleLabel.textContent = toggleNotesCheckbox.checked ? "Show Notes" : "Hide Notes";
+});
   </script>
 </body>
 </html>
